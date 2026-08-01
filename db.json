@@ -1,0 +1,28 @@
+{
+  "applicants": [
+    {
+      "id": "1785592052558",
+      "createdAt": "2026-08-01T13:47:32.558Z",
+      "status": "جديد",
+      "name": "hazemfawy HR",
+      "email": "hazemfawyhr@gmail.com",
+      "phone": "01096213327",
+      "address": "اببوزعبل",
+      "nationalId": "30007081401974",
+      "job": "عامل إنتاج",
+      "message": ""
+    },
+    {
+      "id": "1785586072386",
+      "createdAt": "2026-08-01T12:07:52.386Z",
+      "status": "جديد",
+      "name": "hazemfawy HR",
+      "email": "hazemfawyhr@gmail.com",
+      "phone": "01096213327",
+      "address": "اببوزعبل",
+      "nationalId": "30007081401974",
+      "job": "مترجم صيني",
+      "message": "hazem"
+    }
+  ]
+}
