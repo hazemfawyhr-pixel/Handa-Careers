@@ -1,17 +1,20 @@
-import { Low } from "lowdb";
-import { JSONFile } from "lowdb/node";
-
-const adapter = new JSONFile("db.json");
-const db = new Low(adapter);
+import { put, list } from "@vercel/blob";
 
 export default async function handler(req, res) {
   try {
-    await db.read();
+    const { blobs } = await list({
+      prefix: "applicants.json",
+    });
 
-    db.data ||= { applicants: [] };
+    let applicants = [];
+
+    if (blobs.length > 0) {
+      const response = await fetch(blobs[0].url);
+      applicants = await response.json();
+    }
 
     if (req.method === "GET") {
-      return res.status(200).json(db.data.applicants || []);
+      return res.status(200).json(applicants);
     }
 
     if (req.method === "POST") {
@@ -22,49 +25,18 @@ export default async function handler(req, res) {
         ...req.body,
       };
 
-      db.data.applicants.unshift(applicant);
+      applicants.unshift(applicant);
 
-      await db.write();
+      await put(
+        "applicants.json",
+        JSON.stringify(applicants),
+        {
+          access: "private",
+          addRandomSuffix: false,
+        }
+      );
 
       return res.status(201).json(applicant);
-    }
-
-    if (req.method === "PUT") {
-      const { id } = req.query;
-
-      const index = db.data.applicants.findIndex(
-        (item) => item.id === id
-      );
-
-      if (index === -1) {
-        return res.status(404).json({
-          error: "Applicant not found",
-        });
-      }
-
-      db.data.applicants[index] = {
-        ...db.data.applicants[index],
-        ...req.body,
-        id,
-      };
-
-      await db.write();
-
-      return res.status(200).json(db.data.applicants[index]);
-    }
-
-    if (req.method === "DELETE") {
-      const { id } = req.query;
-
-      db.data.applicants = db.data.applicants.filter(
-        (item) => item.id !== id
-      );
-
-      await db.write();
-
-      return res.status(200).json({
-        message: "Deleted successfully",
-      });
     }
 
     return res.status(405).json({
