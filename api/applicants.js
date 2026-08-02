@@ -18,18 +18,18 @@ export default async function handler(req, res) {
     });
 
     if (result.blobs.length > 0) {
-      const response = await fetch(result.blobs[0].url);
+      // اختيار أحدث ملف
+      const latestBlob = result.blobs.sort(
+        (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
+      )[0];
+
+      const response = await fetch(latestBlob.url);
 
       if (response.ok) {
-        const text = await response.text();
+        const data = await response.json();
 
-        try {
-          const data = JSON.parse(text);
-          if (Array.isArray(data)) {
-            applicants = data;
-          }
-        } catch {
-          applicants = [];
+        if (Array.isArray(data)) {
+          applicants = data;
         }
       }
     }
@@ -48,15 +48,11 @@ export default async function handler(req, res) {
 
       applicants.unshift(applicant);
 
-      await put(
-        "applicants.json",
-        JSON.stringify(applicants),
-        {
-          access: "private",
-          allowOverwrite: true,
-          token,
-        }
-      );
+      await put("applicants.json", JSON.stringify(applicants), {
+        access: "private",
+        allowOverwrite: true,
+        token,
+      });
 
       return res.status(201).json(applicant);
     }
@@ -78,15 +74,11 @@ export default async function handler(req, res) {
         id,
       };
 
-      await put(
-        "applicants.json",
-        JSON.stringify(applicants),
-        {
-          access: "private",
-          allowOverwrite: true,
-          token,
-        }
-      );
+      await put("applicants.json", JSON.stringify(applicants), {
+        access: "private",
+        allowOverwrite: true,
+        token,
+      });
 
       return res.status(200).json(applicants[index]);
     }
@@ -96,15 +88,11 @@ export default async function handler(req, res) {
 
       applicants = applicants.filter((item) => item.id !== id);
 
-      await put(
-        "applicants.json",
-        JSON.stringify(applicants),
-        {
-          access: "private",
-          allowOverwrite: true,
-          token,
-        }
-      );
+      await put("applicants.json", JSON.stringify(applicants), {
+        access: "private",
+        allowOverwrite: true,
+        token,
+      });
 
       return res.status(200).json({
         message: "Deleted successfully",
