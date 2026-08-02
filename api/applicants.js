@@ -2,8 +2,17 @@ import { put, list } from "@vercel/blob";
 
 export default async function handler(req, res) {
   try {
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+
+    if (!token) {
+      return res.status(500).json({
+        error: "BLOB_READ_WRITE_TOKEN is missing",
+      });
+    }
+
     const { blobs } = await list({
       prefix: "applicants.json",
+      token,
     });
 
     let applicants = [];
@@ -33,6 +42,7 @@ export default async function handler(req, res) {
         {
           access: "private",
           addRandomSuffix: false,
+          token,
         }
       );
 
