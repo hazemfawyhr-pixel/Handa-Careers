@@ -18,35 +18,27 @@ export default async function handler(req, res) {
     });
 
     if (result.blobs.length > 0) {
-      const blob = result.blobs[0];
-
-      const response = await fetch(blob.url);
+      const response = await fetch(result.blobs[0].url);
 
       if (response.ok) {
         const text = await response.text();
 
         try {
           const data = JSON.parse(text);
-
           if (Array.isArray(data)) {
             applicants = data;
           }
-        } catch (e) {
+        } catch {
           applicants = [];
         }
       }
     }
 
-
-    // GET
     if (req.method === "GET") {
       return res.status(200).json(applicants);
     }
 
-
-    // POST
     if (req.method === "POST") {
-
       const applicant = {
         id: Date.now().toString(),
         createdAt: new Date().toISOString(),
@@ -56,35 +48,23 @@ export default async function handler(req, res) {
 
       applicants.unshift(applicant);
 
-
-      const saved = await put(
+      await put(
         "applicants.json",
         JSON.stringify(applicants),
         {
-          access: "public",
+          access: "private",
           allowOverwrite: true,
           token,
         }
       );
 
-
-      return res.status(201).json({
-        success: true,
-        applicant,
-        url: saved.url,
-      });
+      return res.status(201).json(applicant);
     }
 
-
-    // PUT
     if (req.method === "PUT") {
-
       const { id } = req.query;
 
-      const index = applicants.findIndex(
-        (item) => item.id === id
-      );
-
+      const index = applicants.findIndex((item) => item.id === id);
 
       if (index === -1) {
         return res.status(404).json({
@@ -92,69 +72,53 @@ export default async function handler(req, res) {
         });
       }
 
-
       applicants[index] = {
         ...applicants[index],
         ...req.body,
         id,
       };
 
-
       await put(
         "applicants.json",
         JSON.stringify(applicants),
         {
-          access: "public",
+          access: "private",
           allowOverwrite: true,
           token,
         }
       );
-
 
       return res.status(200).json(applicants[index]);
     }
 
-
-    // DELETE
     if (req.method === "DELETE") {
-
       const { id } = req.query;
 
-
-      applicants = applicants.filter(
-        (item) => item.id !== id
-      );
-
+      applicants = applicants.filter((item) => item.id !== id);
 
       await put(
         "applicants.json",
         JSON.stringify(applicants),
         {
-          access: "public",
+          access: "private",
           allowOverwrite: true,
           token,
         }
       );
-
 
       return res.status(200).json({
         message: "Deleted successfully",
       });
     }
 
-
     return res.status(405).json({
       error: "Method not allowed",
     });
-
-
   } catch (error) {
-
     console.error("API ERROR:", error);
 
     return res.status(500).json({
       error: error.message,
     });
-
   }
 }
