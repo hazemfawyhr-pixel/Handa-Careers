@@ -26,7 +26,6 @@ function normalizeNationalId(value) {
 export default function Apply({ jobs = [], onSubmit }) {
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
     phone: "",
     nationalId: "",
     address: "",
@@ -58,7 +57,6 @@ export default function Apply({ jobs = [], onSubmit }) {
       setLoading(true);
       onSubmit({
         name: formData.fullName.trim(),
-        email: formData.email.trim(),
         phone: formData.phone.trim(),
         address: formData.address.trim(),
         nationalId: normalizedNationalId,
@@ -69,7 +67,6 @@ export default function Apply({ jobs = [], onSubmit }) {
           setSubmitted(true);
           setFormData({
             fullName: "",
-            email: "",
             phone: "",
             nationalId: "",
             address: "",
@@ -154,27 +151,6 @@ export default function Apply({ jobs = [], onSubmit }) {
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="أدخل اسمك الكامل"
-                required
-                style={{
-                  width: "100%",
-                  padding: "14px",
-                  marginBottom: "18px",
-                  borderRadius: "14px",
-                  border: "1px solid #d1d5db",
-                  fontSize: "16px",
-                  boxSizing: "border-box",
-                }}
-              />
-
-              <label style={{ display: "block", marginBottom: "8px", color: "#334155" }}>
-                البريد الإلكتروني
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="example@mail.com"
                 required
                 style={{
                   width: "100%",
