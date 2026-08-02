@@ -138,7 +138,6 @@ export default function Admin({ jobs = [], onAddJob, onUpdateJob, onDeleteJob })
     setEditId(applicant.id);
     setEditData({
       name: applicant.name,
-      email: applicant.email,
       phone: applicant.phone,
       address: applicant.address || "",
       nationalId: applicant.nationalId || "",
@@ -202,7 +201,6 @@ export default function Admin({ jobs = [], onAddJob, onUpdateJob, onDeleteJob })
     const rows = [
       [
         "الاسم",
-        "البريد الإلكتروني",
         "رقم الهاتف",
         "الرقم القومي",
         "الوظيفة",
@@ -214,7 +212,6 @@ export default function Admin({ jobs = [], onAddJob, onUpdateJob, onDeleteJob })
       ],
       ...filteredApplicants.map((applicant) => [
         applicant.name || "",
-        applicant.email || "",
         applicant.phone || "",
         applicant.nationalId || "",
         applicant.job || "",
@@ -243,7 +240,7 @@ export default function Admin({ jobs = [], onAddJob, onUpdateJob, onDeleteJob })
     const normalizedSearch = searchText.trim().toLowerCase();
     const matchesText =
       !normalizedSearch ||
-      [applicant.name, applicant.email, applicant.phone, applicant.nationalId, applicant.job]
+      [applicant.name, applicant.phone, applicant.nationalId, applicant.job]
         .some((field) => field?.toLowerCase().includes(normalizedSearch));
 
     const matchesJob = jobFilter === "all" || applicant.job === jobFilter;
@@ -777,8 +774,6 @@ export default function Admin({ jobs = [], onAddJob, onUpdateJob, onDeleteJob })
                     }}
                   >
                     <div>
-                      <strong>البريد الإلكتروني</strong>
-                      <p style={{ margin: "8px 0 0", color: "#334155" }}>{applicant.email}</p>
                     </div>
                     <div>
                       <strong>رقم الهاتف</strong>
@@ -937,7 +932,6 @@ export default function Admin({ jobs = [], onAddJob, onUpdateJob, onDeleteJob })
             >
               {[
                 { label: "الاسم الكامل", name: "name" },
-                { label: "البريد الإلكتروني", name: "email" },
                 { label: "رقم الهاتف", name: "phone" },
                 { label: "العنوان", name: "address" },
                 { label: "الرقم القومي", name: "nationalId" },
