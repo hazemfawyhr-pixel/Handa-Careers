@@ -12,19 +12,27 @@ export default async function handler(req, res) {
 
     let applicants = [];
 
-    const { blobs } = await list({
+    const result = await list({
       prefix: "applicants.json",
       token,
     });
 
-    if (blobs && blobs.length > 0) {
-      const response = await fetch(blobs[0].url);
+    if (result.blobs.length > 0) {
+      const blob = result.blobs[0];
+
+      const response = await fetch(blob.url);
 
       if (response.ok) {
-        const data = await response.json();
+        const text = await response.text();
 
-        if (Array.isArray(data)) {
-          applicants = data;
+        try {
+          const data = JSON.parse(text);
+
+          if (Array.isArray(data)) {
+            applicants = data;
+          }
+        } catch (e) {
+          applicants = [];
         }
       }
     }
@@ -46,31 +54,32 @@ export default async function handler(req, res) {
         ...req.body,
       };
 
-
       applicants.unshift(applicant);
 
 
-      await put(
+      const saved = await put(
         "applicants.json",
         JSON.stringify(applicants),
         {
-          access: "private",
+          access: "public",
           allowOverwrite: true,
           token,
         }
       );
 
 
-      return res.status(201).json(applicant);
+      return res.status(201).json({
+        success: true,
+        applicant,
+        url: saved.url,
+      });
     }
-
 
 
     // PUT
     if (req.method === "PUT") {
 
       const { id } = req.query;
-
 
       const index = applicants.findIndex(
         (item) => item.id === id
@@ -95,7 +104,7 @@ export default async function handler(req, res) {
         "applicants.json",
         JSON.stringify(applicants),
         {
-          access: "private",
+          access: "public",
           allowOverwrite: true,
           token,
         }
@@ -104,7 +113,6 @@ export default async function handler(req, res) {
 
       return res.status(200).json(applicants[index]);
     }
-
 
 
     // DELETE
@@ -122,7 +130,7 @@ export default async function handler(req, res) {
         "applicants.json",
         JSON.stringify(applicants),
         {
-          access: "private",
+          access: "public",
           allowOverwrite: true,
           token,
         }
@@ -135,7 +143,6 @@ export default async function handler(req, res) {
     }
 
 
-
     return res.status(405).json({
       error: "Method not allowed",
     });
@@ -143,7 +150,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
 
-    console.error(error);
+    console.error("API ERROR:", error);
 
     return res.status(500).json({
       error: error.message,
