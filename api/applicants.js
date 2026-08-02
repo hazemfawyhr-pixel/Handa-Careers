@@ -18,22 +18,22 @@ export default async function handler(req, res) {
     let applicants = [];
 
     if (blobs.length > 0) {
-      const response = await fetch(blobs[0].url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(blobs[0].url);
 
       if (response.ok) {
         applicants = await response.json();
       }
     }
 
+    // GET
     if (req.method === "GET") {
       return res.status(200).json(applicants);
     }
 
+
+    // POST إضافة طلب
     if (req.method === "POST") {
+
       const applicant = {
         id: Date.now().toString(),
         createdAt: new Date().toISOString(),
@@ -48,7 +48,6 @@ export default async function handler(req, res) {
         JSON.stringify(applicants),
         {
           access: "private",
-          addRandomSuffix: false,
           allowOverwrite: true,
           token,
         }
@@ -57,11 +56,79 @@ export default async function handler(req, res) {
       return res.status(201).json(applicant);
     }
 
+
+    // PUT تعديل الطلب أو تغيير الحالة
+    if (req.method === "PUT") {
+
+      const { id } = req.query;
+
+      const index = applicants.findIndex(
+        (item) => item.id === id
+      );
+
+      if (index === -1) {
+        return res.status(404).json({
+          error: "Applicant not found",
+        });
+      }
+
+
+      applicants[index] = {
+        ...applicants[index],
+        ...req.body,
+        id,
+      };
+
+
+      await put(
+        "applicants.json",
+        JSON.stringify(applicants),
+        {
+          access: "private",
+          allowOverwrite: true,
+          token,
+        }
+      );
+
+
+      return res.status(200).json(applicants[index]);
+    }
+
+
+
+    // DELETE حذف الطلب
+    if (req.method === "DELETE") {
+
+      const { id } = req.query;
+
+
+      applicants = applicants.filter(
+        (item) => item.id !== id
+      );
+
+
+      await put(
+        "applicants.json",
+        JSON.stringify(applicants),
+        {
+          access: "private",
+          allowOverwrite: true,
+          token,
+        }
+      );
+
+
+      return res.status(204).send();
+    }
+
+
     return res.status(405).json({
       error: "Method not allowed",
     });
 
+
   } catch (error) {
+
     console.error(error);
 
     return res.status(500).json({
