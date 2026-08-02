@@ -25,13 +25,14 @@ export default async function handler(req, res) {
       }
     }
 
-    // GET
+
+    // GET - جلب الطلبات
     if (req.method === "GET") {
       return res.status(200).json(applicants);
     }
 
 
-    // POST إضافة طلب
+    // POST - إضافة طلب جديد
     if (req.method === "POST") {
 
       const applicant = {
@@ -57,14 +58,16 @@ export default async function handler(req, res) {
     }
 
 
-    // PUT تعديل الطلب أو تغيير الحالة
+
+    // PUT - تعديل الطلب أو تغيير الحالة
     if (req.method === "PUT") {
 
-      const { id } = req.query;
+      const id = req.query.id;
 
       const index = applicants.findIndex(
         (item) => item.id === id
       );
+
 
       if (index === -1) {
         return res.status(404).json({
@@ -96,10 +99,10 @@ export default async function handler(req, res) {
 
 
 
-    // DELETE حذف الطلب
+    // DELETE - حذف الطلب
     if (req.method === "DELETE") {
 
-      const { id } = req.query;
+      const id = req.query.id;
 
 
       applicants = applicants.filter(
@@ -118,8 +121,11 @@ export default async function handler(req, res) {
       );
 
 
-      return res.status(204).send();
+      return res.status(200).json({
+        message: "Deleted successfully",
+      });
     }
+
 
 
     return res.status(405).json({
@@ -134,5 +140,6 @@ export default async function handler(req, res) {
     return res.status(500).json({
       error: error.message,
     });
+
   }
 }
