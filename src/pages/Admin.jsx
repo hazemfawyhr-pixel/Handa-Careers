@@ -41,7 +41,7 @@ export default function Admin({ jobs = [], onAddJob, onUpdateJob, onDeleteJob })
     setLoading(true);
     getApplicants()
       .then((data) => {
-        setAdminApplicants(data);
+        setAdminApplicants(Array.isArray(data) ? data : []);
       })
       .catch((error) => {
         console.error("Failed to load applicants", error);
