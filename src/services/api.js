@@ -13,9 +13,13 @@ export function createApplicant(applicant) {
 }
 
 export function updateApplicant(id, applicant) {
-  return api.put(`/applicants/${id}`, applicant).then((res) => res.data);
+  return api
+    .put(`/applicants?id=${id}`, applicant)
+    .then((res) => res.data);
 }
 
 export function deleteApplicant(id) {
-  return api.delete(`/applicants/${id}`).then((res) => res.data);
+  return api
+    .delete(`/applicants?id=${id}`)
+    .then((res) => res.data);
 }
