@@ -18,8 +18,15 @@ export default async function handler(req, res) {
     let applicants = [];
 
     if (blobs.length > 0) {
-      const response = await fetch(blobs[0].url);
-      applicants = await response.json();
+      const response = await fetch(blobs[0].url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        applicants = await response.json();
+      }
     }
 
     if (req.method === "GET") {
